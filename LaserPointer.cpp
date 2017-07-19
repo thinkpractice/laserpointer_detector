@@ -12,22 +12,28 @@ Mat background;
 
 void detectAndDisplay(Mat image, int i)
 {
-    Mat planes[3];
-    split(image,planes); 
     namedWindow("Image",WINDOW_AUTOSIZE);
     
-    Mat blurredImage;
-    GaussianBlur(planes[2], blurredImage, Size( 31, 31 ), 0, 0);
-
-    Mat normalizedRed;
-    //normalize(blurredImage, normalizedRed, 0, 255, NORM_MINMAX);
-    normalizedRed = blurredImage;
     if (i==0)
     {
-        background = normalizedRed;
+        background = image;
     }
+    Mat imageHsv;
+    cvtColor(image,imageHsv,CV_RGB2HSV);
+
+    Mat hsvComponents[3];
+    split(imageHsv, hsvComponents);
+
+    Mat thresholdImage1;
+    Mat thresholdImage2;
+    Mat thresholdImage3;
+    threshold(hsvComponents[0], thresholdImage1, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    threshold(hsvComponents[1], thresholdImage2, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    threshold(hsvComponents[2], thresholdImage3, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    
+
     Mat thresholdedImage;
-    threshold(normalizedRed-background, thresholdedImage, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    thresholdedImage = thresholdImage1 & thresholdImage2 & thresholdImage3;
     imshow("Image",thresholdedImage);
 }
 
