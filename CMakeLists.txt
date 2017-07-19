@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.5)
+project( LaserPointer )
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+add_executable( LaserPointer LaserPointer.cpp )
+target_link_libraries( LaserPointer ${OpenCV_LIBS} )
