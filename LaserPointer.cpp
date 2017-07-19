@@ -8,12 +8,27 @@
 using namespace cv;
 using namespace std;
 
-void detectAndDisplay(Mat image)
+Mat background;
+
+void detectAndDisplay(Mat image, int i)
 {
     Mat planes[3];
     split(image,planes); 
     namedWindow("Image",WINDOW_AUTOSIZE);
-    imshow("Image", planes[2]);
+    
+    Mat blurredImage;
+    GaussianBlur(planes[2], blurredImage, Size( 31, 31 ), 0, 0);
+
+    Mat normalizedRed;
+    //normalize(blurredImage, normalizedRed, 0, 255, NORM_MINMAX);
+    normalizedRed = blurredImage;
+    if (i==0)
+    {
+        background = normalizedRed;
+    }
+    Mat thresholdedImage;
+    threshold(normalizedRed-background, thresholdedImage, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    imshow("Image",thresholdedImage);
 }
 
 int main(int argc, char** argv)
@@ -28,15 +43,16 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    int i = 0;
     while (capture.read(frame))
     {
         if (frame.empty())
             break;
-        detectAndDisplay(frame);
-
+        detectAndDisplay(frame,i);
         char c = (char)waitKey(10);
         if (c == 27)
             break;
+        i++;
     }
 }
 
