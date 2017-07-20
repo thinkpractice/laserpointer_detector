@@ -4,37 +4,18 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <vector>
-
 using namespace cv;
 using namespace std;
 
 Mat background;
-
+Ptr<BackgroundSubtractor> pMog2;
+  
 void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Image",WINDOW_AUTOSIZE);
-    
-    if (i==0)
-    {
-        background = image;
-    }
-    Mat imageHsv;
-    cvtColor(image,imageHsv,CV_RGB2HSV);
-
-    Mat hsvComponents[3];
-    split(imageHsv, hsvComponents);
-
-    Mat thresholdImage1;
-    Mat thresholdImage2;
-    Mat thresholdImage3;
-    threshold(hsvComponents[0], thresholdImage1, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    threshold(hsvComponents[1], thresholdImage2, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    threshold(hsvComponents[2], thresholdImage3, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    
-
-    Mat thresholdedImage;
-    thresholdedImage = thresholdImage1 & thresholdImage2 & thresholdImage3;
-    imshow("Image",thresholdedImage);
+    Mat foregroundImage;
+    pMog2->apply(image,foregroundImage);
+    imshow("Image",foregroundImage);
 }
 
 int main(int argc, char** argv)
@@ -42,7 +23,8 @@ int main(int argc, char** argv)
     VideoCapture capture;
     Mat frame;
 
-    capture.open(1);
+    pMog2 = createBackgroundSubtractorMOG2();
+    capture.open(0);
     if (!capture.isOpened())
     {
         printf("Error opening video capture\n");
@@ -60,5 +42,6 @@ int main(int argc, char** argv)
             break;
         i++;
     }
+    capture.release();
 }
 
