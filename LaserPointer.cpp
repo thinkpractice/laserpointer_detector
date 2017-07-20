@@ -16,18 +16,20 @@ void detectAndDisplay(Mat image, int i)
     Mat filteredImage;
     medianBlur(image, filteredImage, 9);
 
-    Mat bgr[3];
-    split(filteredImage, bgr);
+    Mat hsv_image;
+    cvtColor(filteredImage, hsv_image, cv::COLOR_BGR2HSV);
 
-    Mat foregroundImage;
-    pMog2->apply(bgr[2],foregroundImage);
+    Mat lowerRedHueRange;
+    Mat upperRedHueRange;
     
-    Mat threshold1;
-    Mat threshold2;
-    Mat threshold3;
-    threshold(bgr[0], threshold1, 250, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    inRange(hsv_image, Scalar(0,100,100), Scalar(10, 255, 255), lowerRedHueRange);
+    inRange(hsv_image, Scalar(160,100,100), Scalar(179, 255, 255),upperRedHueRange);
 
-    imshow("Image",threshold1 & threshold2 & threshold3);
+    Mat redHueImage;
+    addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
+    GaussianBlur(redHueImage, redHueImage, Size(9,9), 2,2);
+
+    imshow("Image",redHueImage);
 }
 
 int main(int argc, char** argv)
