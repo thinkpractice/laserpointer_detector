@@ -13,9 +13,16 @@ Ptr<BackgroundSubtractor> pMog2;
 void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Image",WINDOW_AUTOSIZE);
+    Mat bgr[3];
+    split(image, bgr);
+
     Mat foregroundImage;
-    pMog2->apply(image,foregroundImage);
-    imshow("Image",foregroundImage);
+    pMog2->apply(bgr[2],foregroundImage);
+    
+    Mat filteredImage;
+    medianBlur(foregroundImage, filteredImage, 9);
+    
+    imshow("Image",filteredImage);
 }
 
 int main(int argc, char** argv)
