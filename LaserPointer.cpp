@@ -12,6 +12,7 @@ Ptr<BackgroundSubtractor> pMog2;
   
 void detectAndDisplay(Mat image, int i)
 {
+    namedWindow("Original Image",WINDOW_AUTOSIZE);
     namedWindow("Image",WINDOW_AUTOSIZE);
     Mat filteredImage;
     medianBlur(image, filteredImage, 9);
@@ -27,8 +28,17 @@ void detectAndDisplay(Mat image, int i)
 
     Mat redHueImage;
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
-    GaussianBlur(redHueImage, redHueImage, Size(9,9), 2,2);
+    //GaussianBlur(redHueImage, redHueImage, Size(9,9), 2,2);
 
+    vector<Vec3f> circles;
+    HoughCircles(redHueImage, circles, HOUGH_GRADIENT, redHueImage.rows / 16, 100, 30, 1, 3);
+
+    for(Vec3i c : circles)
+    {
+        circle(image, Point(c[0], c[1]), c[2], Scalar(0,0,255), 3, LINE_AA);
+        circle(image, Point(c[0], c[1]), 2, Scalar(0,255,0), 3, LINE_AA);
+    }
+    imshow("Original Image",image);
     imshow("Image",redHueImage);
 }
 
