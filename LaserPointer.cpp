@@ -40,7 +40,7 @@ void drawOverlayCircles(Mat image, vector<Vec6i>& circles)
         if (overlayCircle[1] <= 0 || overlayCircle[1] >= image.cols)
             overlayCircle[4] *= -1;
 
-        circle(image, Point(overlayCircle[0], overlayCircle[1]), overlayCircle[2], Scalar(0,0,255), 3, LINE_AA);
+        circle(image, Point(overlayCircle[0], overlayCircle[1]), overlayCircle[2], Scalar(0,0,255), CV_FILLED, LINE_AA);
     }
 }
 
