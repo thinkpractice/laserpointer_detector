@@ -28,11 +28,11 @@ void detectAndDisplay(Mat image, int i)
 
     Mat redHueImage;
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
-    //GaussianBlur(redHueImage, redHueImage, Size(9,9), 2,2);
+    medianBlur(redHueImage, redHueImage, 3);
 
     vector<Vec3f> circles;
-    HoughCircles(redHueImage, circles, HOUGH_GRADIENT, redHueImage.rows / 16, 100, 30, 1, 3);
-
+    HoughCircles(redHueImage, circles, HOUGH_GRADIENT,2, redHueImage.rows / 16, 100, 20, 0, 0);
+    //printf("Number of detected circles: %d\n",(int)circles.size());
     for(Vec3i c : circles)
     {
         circle(image, Point(c[0], c[1]), c[2], Scalar(0,0,255), 3, LINE_AA);
