@@ -48,7 +48,6 @@ void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Original Image",WINDOW_AUTOSIZE);
     namedWindow("Image",WINDOW_AUTOSIZE);
-    namedWindow("Inverted Image",WINDOW_AUTOSIZE);
     Mat filteredImage;
     medianBlur(image, filteredImage, 9);
 
@@ -62,10 +61,13 @@ void detectAndDisplay(Mat image, int i)
     Mat upperRedHueRange;
     
     inRange(hsvImage, Scalar(0,100,100), Scalar(10, 255, 255), lowerRedHueRange);
-    inRange(hsvImage, Scalar(160,100,100), Scalar(179, 255, 255),upperRedHueRange);
+    inRange(hsvImage, Scalar(160,100,100), Scalar(180, 255, 255),upperRedHueRange);
 
     Mat redHueImage;
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
+
+    Mat invertedImage;
+    threshold(redHueImage, invertedImage, 200, 255, CV_THRESH_BINARY_INV);
 
     SimpleBlobDetector::Params params;
     //TODO tweak parameters to detect laser dots of different size
@@ -85,20 +87,16 @@ void detectAndDisplay(Mat image, int i)
     params.filterByInertia = true;
     params.minInertiaRatio = 0.01;
 
-    Mat invertedImage;
-    threshold(hsvComponents[2], invertedImage, 240, 255, cv::THRESH_BINARY_INV);
 
     vector<KeyPoint> keypoints;
     Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
     detector->detect(invertedImage, keypoints);
 
     drawKeypoints(image, keypoints, image, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    drawKeypoints(redHueImage, keypoints, redHueImage, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    drawKeypoints(invertedImage, keypoints,invertedImage, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    drawKeypoints(redHueImage, keypoints,redHueImage, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     
     imshow("Original Image",image);
     imshow("Image",redHueImage);
-    imshow("Inverted Image",invertedImage);
 }
 
 int main(int argc, char** argv)
