@@ -55,6 +55,9 @@ void detectAndDisplay(Mat image, int i)
     Mat hsvImage;
     cvtColor(filteredImage, hsvImage, cv::COLOR_BGR2HSV);
 
+    Mat hsvComponents[3];
+    split(hsvImage, hsvComponents);
+    
     Mat lowerRedHueRange;
     Mat upperRedHueRange;
     
@@ -83,7 +86,7 @@ void detectAndDisplay(Mat image, int i)
     params.minInertiaRatio = 0.01;
 
     Mat invertedImage;
-    threshold(redHueImage, invertedImage, 200, 255, cv::THRESH_BINARY_INV);
+    threshold(hsvComponents[2], invertedImage, 240, 255, cv::THRESH_BINARY_INV);
 
     vector<KeyPoint> keypoints;
     Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
@@ -104,7 +107,7 @@ int main(int argc, char** argv)
     Mat frame;
 
     pMog2 = createBackgroundSubtractorMOG2();
-    capture.open(1);
+    capture.open(0);
     if (!capture.isOpened())
     {
         printf("Error opening video capture\n");
