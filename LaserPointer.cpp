@@ -63,10 +63,10 @@ void detectAndDisplay(Mat image, int i)
     Mat redHueImage;
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
 
-    vector<KeyPoint> keypoints;
-    SimpleBlobDetector detector;
-    detector.detect(redHueImage, keypoints);
-
+//    vector<KeyPoint> keypoints;
+//    SimpleBlobDetector detector;
+//    detector.detect(redHueImage, keypoints);
+//
     //drawKeypoints(image, keypoints, image, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     //vector<Vec3f> circles;
     //HoughCircles(redHueImage, circles, HOUGH_GRADIENT,2, 10, 100, 50, 0, 0);
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     Mat frame;
 
     pMog2 = createBackgroundSubtractorMOG2();
-    capture.open(0);
+    capture.open(1);
     if (!capture.isOpened())
     {
         printf("Error opening video capture\n");
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
         if (i == 0)
             initOverlayCircles(frame);
 
-        drawOverlayCircles(frame, overlayCircles);
+        //drawOverlayCircles(frame, overlayCircles);
         detectAndDisplay(frame,i);
         
         char c = (char)waitKey(10);
