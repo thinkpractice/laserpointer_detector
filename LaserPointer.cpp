@@ -48,6 +48,7 @@ void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Original Image",WINDOW_AUTOSIZE);
     namedWindow("Image",WINDOW_AUTOSIZE);
+    namedWindow("Inverted Image",WINDOW_AUTOSIZE);
     Mat filteredImage;
     medianBlur(image, filteredImage, 9);
 
@@ -63,21 +64,38 @@ void detectAndDisplay(Mat image, int i)
     Mat redHueImage;
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
 
-//    vector<KeyPoint> keypoints;
-//    SimpleBlobDetector detector;
-//    detector.detect(redHueImage, keypoints);
-//
-    //drawKeypoints(image, keypoints, image, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    //vector<Vec3f> circles;
-    //HoughCircles(redHueImage, circles, HOUGH_GRADIENT,2, 10, 100, 50, 0, 0);
-    //////printf("Number of detected circles: %d\n",(int)circles.size());
-    //for(Vec3i c : circles)
-    //{
-    //    circle(image, Point(c[0], c[1]), c[2], Scalar(0,0,255), 3, LINE_AA);
-    //    circle(image, Point(c[0], c[1]), 2, Scalar(0,0,255), 3, LINE_AA);
-    //}
+    SimpleBlobDetector::Params params;
+     
+    // Change thresholds
+    params.minThreshold = 10;
+    params.maxThreshold = 200;
+     
+    // Filter by Circularity
+    params.filterByCircularity = true;
+    params.minCircularity = 0.1;
+     
+    // Filter by Convexity
+    params.filterByConvexity = true;
+    params.minConvexity = 0.87;
+     
+    // Filter by Inertia
+    params.filterByInertia = true;
+    params.minInertiaRatio = 0.01;
+
+    Mat invertedImage;
+    threshold(redHueImage, invertedImage, 200, 255, cv::THRESH_BINARY_INV);
+
+    vector<KeyPoint> keypoints;
+    Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
+    detector->detect(invertedImage, keypoints);
+
+    drawKeypoints(image, keypoints, image, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    drawKeypoints(redHueImage, keypoints, redHueImage, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    drawKeypoints(invertedImage, keypoints,invertedImage, Scalar(0,255,0), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    
     imshow("Original Image",image);
     imshow("Image",redHueImage);
+    imshow("Inverted Image",invertedImage);
 }
 
 int main(int argc, char** argv)
@@ -93,6 +111,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    //capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.25);
+
     int i = 0;
     while (capture.read(frame))
     {
@@ -101,7 +121,7 @@ int main(int argc, char** argv)
         if (i == 0)
             initOverlayCircles(frame);
 
-        //drawOverlayCircles(frame, overlayCircles);
+        drawOverlayCircles(frame, overlayCircles);
         detectAndDisplay(frame,i);
         
         char c = (char)waitKey(10);
