@@ -110,8 +110,10 @@ int main(int argc, char** argv)
         printf("Error opening video capture\n");
         return -1;
     }
-
-    //capture.set(cv::CAP_PROP_AUTO_EXPOSURE, 0.25);
+    
+    //Get current exposure value and save it
+    double originalExposure = capture.get(CV_CAP_PROP_EXPOSURE);
+    capture.set(CV_CAP_PROP_EXPOSURE, 0.0);
 
     int i = 0;
     while (capture.read(frame))
@@ -129,6 +131,7 @@ int main(int argc, char** argv)
             break;
         i++;
     }
+    capture.set(CV_CAP_PROP_EXPOSURE, originalExposure);
     capture.release();
 }
 
