@@ -65,7 +65,7 @@ void detectAndDisplay(Mat image, int i)
     addWeighted(lowerRedHueRange,1.0, upperRedHueRange,1.0, 0.0, redHueImage);
 
     SimpleBlobDetector::Params params;
-     
+    //TODO tweak parameters to detect laser dots of different size
     // Change thresholds
     params.minThreshold = 10;
     params.maxThreshold = 200;
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
         if (i == 0)
             initOverlayCircles(frame);
 
-        drawOverlayCircles(frame, overlayCircles);
+        //drawOverlayCircles(frame, overlayCircles);
         detectAndDisplay(frame,i);
         
         char c = (char)waitKey(10);
