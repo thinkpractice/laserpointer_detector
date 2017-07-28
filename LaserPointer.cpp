@@ -48,8 +48,8 @@ void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Original Image",WINDOW_AUTOSIZE);
     namedWindow("Image",WINDOW_AUTOSIZE);
-    Mat filteredImage;
-    medianBlur(image, filteredImage, 9);
+    Mat filteredImage = image;
+    //medianBlur(image, filteredImage, 9);
 
     Mat hsvImage;
     cvtColor(filteredImage, hsvImage, cv::COLOR_BGR2HSV);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     Mat frame;
 
     pMog2 = createBackgroundSubtractorMOG2();
-    capture.open(0);
+    capture.open(1);
     if (!capture.isOpened())
     {
         printf("Error opening video capture\n");
