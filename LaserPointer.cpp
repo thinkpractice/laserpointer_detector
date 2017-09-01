@@ -9,6 +9,7 @@ using namespace cv;
 using namespace std;
 
 Mat background;
+Mat dest;
 Ptr<BackgroundSubtractor> pMog2;
 
 vector<Vec6i> overlayCircles;
@@ -48,7 +49,59 @@ void detectAndDisplay(Mat image, int i)
 {
     namedWindow("Original Image",WINDOW_AUTOSIZE);
     namedWindow("Image",WINDOW_AUTOSIZE);
-    Mat filteredImage = image;
+    if (i == 100)
+    {
+        background = image.clone();
+    }
+    else if (i > 100)
+    {
+        i = 101;
+        dest = image - background;
+    
+        imshow("Background Image", background);
+        imshow("Image", dest);
+
+        Mat bgr[3];
+        split(dest, bgr);
+        Mat redHueImage = bgr[1];
+
+
+
+     Mat invertedImage;
+    threshold(redHueImage, invertedImage, 150, 255, CV_THRESH_BINARY_INV);
+
+        imshow("b", invertedImage);
+    SimpleBlobDetector::Params params;
+    //TODO tweak parameters to detect laser dots of different size
+    // Change thresholds
+    params.minThreshold = 0;
+    params.maxThreshold = 10;
+     
+    // Filter by Circularity
+    params.filterByCircularity = true;
+    params.minCircularity = 0.1;
+     
+    // Filter by Convexity
+    params.filterByConvexity = true;
+    params.minConvexity = 0.87;
+     
+    // Filter by Inertia
+    params.filterByInertia = true;
+    params.minInertiaRatio = 0.01;
+
+
+    vector<KeyPoint> keypoints;
+    Ptr<SimpleBlobDetector> detector = SimpleBlobDetector::create(params);
+    detector->detect(invertedImage, keypoints);
+
+    drawKeypoints(image, keypoints, image, Scalar(0,0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    drawKeypoints(redHueImage, keypoints,redHueImage, Scalar(0, 0,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    
+   imshow("Original Image",image);
+    }
+    if (false)
+    {
+    Mat filteredImage;
     //medianBlur(image, filteredImage, 9);
 
     Mat hsvImage;
@@ -97,6 +150,7 @@ void detectAndDisplay(Mat image, int i)
     
     imshow("Original Image",image);
     imshow("Image",redHueImage);
+    }
 }
 
 int main(int argc, char** argv)
